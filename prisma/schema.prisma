@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id       BigInt   @id @default(autoincrement()) @db.BigInt
+  email    String   @unique @db.VarChar(256)
+  name     String?  @db.VarChar(100)
+  password Bytes    @db.TinyBlob
+  salt     Bytes    @db.TinyBlob
+  isAdmin  Boolean  @default(false)
+  Rental   rental[]
+}
+
+model book {
+  id          BigInt   @id @default(autoincrement()) @db.BigInt
+  isbn13      Int      @unique @db.Int
+  title       String   @db.VarChar(200)
+  author      String   @db.VarChar(100)
+  publishDate DateTime @db.Date
+  Rental      rental[]
+}
+
+model rental {
+  id             BigInt    @id @default(autoincrement()) @db.BigInt
+  bookId         BigInt    @db.BigInt
+  userId         BigInt    @db.BigInt
+  rentalDate     DateTime  @default(now()) @db.DateTime
+  returnDeadline DateTime  @default(now()) @db.DateTime
+  returnDate     DateTime? @db.DateTime
+  book           book      @relation(fields: [bookId], references: [id])
+  user           user      @relation(fields: [userId], references: [id])
+}
