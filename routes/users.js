@@ -12,6 +12,15 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
+router.get("/check", (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({result: "NG"})
+    }
+
+    return res.status(200).json({result: "OK", isAdmin: req.user.isAdmin})
+
+})
+
 router.post("/register", async (req, res, next) => {
     const {email, pass} = req.body;
     const name = req.body?.name
@@ -47,7 +56,7 @@ router.post("/login", async (req, res, next) => {
             if (loginErr) {
                 return next(loginErr);
             }
-            return res.json({result: 'OK', isAdmin: user});
+            return res.json({result: 'OK', isAdmin: user.isAdmin});
         });
     })(req, res, next);
 })

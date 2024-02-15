@@ -1,5 +1,5 @@
 const LocalStrategy = require("passport-local");
-const { PrismaClient } = require("@prisma/client");
+const {PrismaClient} = require("@prisma/client");
 const crypto = require("node:crypto");
 
 const N = Math.pow(2, 17);
@@ -22,14 +22,14 @@ const calcHash = (plain, salt) => {
 const config = passport => {
     const prisma = new PrismaClient();
     passport.use(new LocalStrategy(
-        { usernameField: "email", passwordField: "pass" },
+        {usernameField: "email", passwordField: "pass"},
         async (email, password, cb) => {
             try {
                 const user = await prisma.user.findUnique({
-                    where: { email }
+                    where: {email}
                 });
                 if (!user) {
-                    return cb(null, false, { message: "ユーザ名かパスワードが違います" });
+                    return cb(null, false, {message: "ユーザ名かパスワードが違います"});
                 }
                 const hashedPassword = calcHash(password, user.salt);
                 if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
@@ -51,7 +51,7 @@ const config = passport => {
     // // ユーザ情報をセッションに保存するルールの定義
     passport.serializeUser((user, done) => {
         process.nextTick(() => {
-            done(null, { id: user.id });
+            done(null, {id: user.id, email: user.email, isAdmin: user.isAdmin});
         });
     });
 
@@ -67,4 +67,4 @@ const config = passport => {
     }
 }
 
-module.exports = { config, generateSalt, calcHash };
+module.exports = {config, generateSalt, calcHash};
