@@ -22,11 +22,11 @@ router.get("/check", (req, res, next) => {
 })
 
 router.post("/register", async (req, res, next) => {
-    const {email, pass} = req.body;
+    const {email, password} = req.body;
     const name = req.body?.name
     try {
         const salt = generateSalt();
-        const hashedPassword = calcHash(pass, salt);
+        const hashedPassword = calcHash(password, salt);
         await prisma.user.create({
             data: {
                 email,
@@ -60,6 +60,16 @@ router.post("/login", async (req, res, next) => {
         });
     })(req, res, next);
 })
+
+router.get("/logout", (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        // req.session.user = null
+        return res.status(200).json({result: "OK"});
+    });
+});
 
 
 module.exports = router;
