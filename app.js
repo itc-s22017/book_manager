@@ -10,7 +10,9 @@ const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const adminRouter = require("./routes/admin")
+const adminRouter = require("./routes/admin");
+const bookRouter = require("./routes/book");
+
 
 const app = express();
 app.use(express.json());
@@ -38,6 +40,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
 app.use('/admin', adminRouter);
+app.use('/book', bookRouter);
+
 
 
 module.exports = app;
