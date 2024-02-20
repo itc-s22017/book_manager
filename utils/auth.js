@@ -36,12 +36,12 @@ const config = passport => {
                     return cb(null, false, {message: "ユーザ名かパスワードが違います2"});
                 }
                 // ユーザもパスワードも正しい場合
-                const userData = {
-                    id: Number(user.id),
-                    email: user.email,
-                    isAdmin: Boolean(user.isAdmin)
-                };
-                return cb(null, userData);
+                // const userData = {
+                //     id: user.id,
+                //     email: user.email,
+                //     isAdmin:user.isAdmin
+                // };
+                return cb(null, user);
             } catch (e) {
                 return cb(e);
             }
