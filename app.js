@@ -7,12 +7,10 @@ const passport = require("passport");
 const {config} = require("./utils/auth")
 const cors = require('cors');
 
-
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const adminRouter = require("./routes/admin");
 const bookRouter = require("./routes/book");
-
 
 const app = express();
 app.use(express.json());
@@ -26,14 +24,14 @@ app.use(session({
     secret: "</2aiG^bd29iC5rj)=G?mKTmnjoj",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60 * 60 * 1000 }
+    cookie: {maxAge: 60 * 60 * 1000}
 }));
 app.use(passport.authenticate("session"));
 app.use(config(passport))
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -42,6 +40,8 @@ app.use('/user', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/book', bookRouter);
 
-
+BigInt.prototype.toJSON = function () {
+    return this.toString()
+}
 
 module.exports = app;
