@@ -14,6 +14,8 @@ const isLogin = (req, res, next) => {
 router.get("/list", isLogin, async (req, res, next) => {
     const page = req.query.page ? parseInt(req.query.page, 10) : 1;
     const skip = pagesize * (page - 1);
+    const totalCount = await prisma.book.count();
+    const maxPage = Math.ceil(totalCount / pagesize);
     let bookRentals = await prisma.book.findMany({
         skip,
         take: pagesize,
@@ -28,10 +30,9 @@ router.get("/list", isLogin, async (req, res, next) => {
             }
         }
     });
-
     bookRentals = bookRentals.map(book => ({
         ...book,
-        isRental: book.Rental.some(rental => rental.returnDate === null)
+        isRental: book.Rental.some(rental => rental.returnDate === null) ? "true" : "false"
     }));
 
     bookRentals = bookRentals.map(({id, title, author, isRental}) => ({
@@ -41,7 +42,7 @@ router.get("/list", isLogin, async (req, res, next) => {
         isRental
     }));
 
-    return res.json({books: bookRentals});
+    return res.json({books: bookRentals, maxPage});
 })
 
 router.get("/detail/:id", async (req, res, next) => {
@@ -90,7 +91,7 @@ router.get("/detail/:id", async (req, res, next) => {
                 },
                 select: {
                     rentalDate: true,
-                    returnDeadline:true,
+                    returnDeadline: true,
                     user: {
                         select: {
                             name: true,
@@ -109,8 +110,8 @@ router.get("/detail/:id", async (req, res, next) => {
     } : null;
 
     const response = {
-        id: bookDetails.id,
-        isbn13: bookDetails.isbn13,
+        id: Number(bookDetails.id),
+        isbn13: Number(bookDetails.isbn13),
         title: bookDetails.title,
         author: bookDetails.author,
         publishDate: bookDetails.publishDate,
