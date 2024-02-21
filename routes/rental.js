@@ -19,7 +19,7 @@ router.post("/start", isLogin, async (req, res, next) => {
             },
         });
         if (rental) {
-            return res.status(409).send(" 貸出中");
+            return res.status(409).json(" 貸出中");
         }
 
         const now = new Date();
@@ -115,6 +115,35 @@ router.get("/current", isLogin, async (req, res, next) => {
     })
 
     return res.status(200).json({rentalBooks: response})
+});
+
+router.get("/history", isLogin, async (req, res, next) => {
+    const rentalHistory = await prisma.rental.findMany({
+        where: {
+           NOT:{
+               returnDate:null
+           }
+        },
+        include: {
+            book: {
+                select: {
+                    title: true
+                }
+            }
+        }
+    });
+
+    const response = rentalHistory.map(info => {
+        return {
+            rentalId: Number(info.id),
+            bookId: Number(info.bookId),
+            bookName: info.book.title,
+            rentalDate: info.rentalDate,
+            returnDate:info.returnDate
+        }
+    })
+
+    return res.status(200).json({rentalHistory: response})
 });
 
 
