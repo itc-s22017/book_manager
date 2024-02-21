@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {PrismaClient} = require("@prisma/client");
+const {login} = require("passport/lib/http/request");
 const prisma = new PrismaClient();
 
 const pagesize = 5;
@@ -36,16 +37,16 @@ router.get("/list", isLogin, async (req, res, next) => {
     }));
 
     bookRentals = bookRentals.map(({id, title, author, isRental}) => ({
-        id: Number(id),
+        id:Number(id),
         title,
         author,
         isRental
     }));
 
-    return res.json({books: bookRentals, maxPage});
+    return res.status(200).json({books: bookRentals, maxPage});
 })
 
-router.get("/detail/:id", async (req, res, next) => {
+router.get("/detail/:id", login, async (req, res, next) => {
     const id = +req.params.id
     // const rentalInfo = await prisma.rental.findFirst({
     //     where: {
@@ -117,7 +118,7 @@ router.get("/detail/:id", async (req, res, next) => {
         publishDate: bookDetails.publishDate,
         rentalInfo: rInfo
     };
-    return res.json(response);
+    return res.status(200).json(response);
 });
 
 module.exports = router;
