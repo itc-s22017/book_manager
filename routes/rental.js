@@ -47,5 +47,48 @@ router.post("/start", isLogin, async (req, res, next) => {
     }
 });
 
+router.put("/return", async (req, res, next) => {
+    const {rentalId} = req.body;
+
+    try {
+        const rental = await prisma.rental.findFirst({
+            where: {
+                id: rentalId,
+                returnDate: null
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        })
+
+        if (!rental) {
+            return res.status(404).json({result: "NG"});
+        }
+
+        if (req.user.id !== rental.user.id.toString()) {
+            return res.status(400).json({result: "NG"});
+        }
+
+        const updatedRental = await prisma.rental.update({
+            where: {
+                id: rentalId,
+                returnDate: null
+            },
+            data: {
+                returnDate: new Date()
+            }
+        });
+        // console.log(typeof req.user.id,typeof rental.user.id.toString())
+        return res.status(200).json({result: "OK"});
+
+    } catch (e) {
+        return res.status(400).json({result: "NG"});
+    }
+});
+
 
 module.exports = router;
