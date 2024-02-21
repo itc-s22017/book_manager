@@ -29,12 +29,12 @@ router.post("/book/create", isAdmin, async (req, res, next) => {
     }
 })
 
-router.post("/book/update",isAdmin, async (req, res, next) => {
+router.put("/book/update",isAdmin, async (req, res, next) => {
     const {isbn13, title, publishDate, author,bookId} = req.body;
     try {
         await prisma.book.update({
             where:{
-                id:bookId
+                id:bookId,
             },
             data: {
                 isbn13,
