@@ -11,6 +11,8 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const adminRouter = require("./routes/admin");
 const bookRouter = require("./routes/book");
+const rentalRouter = require("./routes/rental");
+
 
 const app = express();
 app.use(express.json());
@@ -39,6 +41,8 @@ app.use('/', indexRouter);
 app.use('/user', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/book', bookRouter);
+app.use('/rental', rentalRouter);
+
 
 BigInt.prototype.toJSON = function () {
     return this.toString()
