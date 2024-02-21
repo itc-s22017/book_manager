@@ -22,7 +22,7 @@ const calcHash = (plain, salt) => {
 const config = passport => {
     const prisma = new PrismaClient();
     passport.use(new LocalStrategy(
-        {usernameField: "email", passwordField: "pass"},
+        {usernameField: "email", passwordField: "password"},
         async (email, password, cb) => {
             try {
                 const user = await prisma.user.findUnique({
@@ -35,12 +35,7 @@ const config = passport => {
                 if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
                     return cb(null, false, {message: "ユーザ名かパスワードが違います2"});
                 }
-                // ユーザもパスワードも正しい場合
-                // const userData = {
-                //     id: user.id,
-                //     email: user.email,
-                //     isAdmin:user.isAdmin
-                // };
+
                 return cb(null, user);
             } catch (e) {
                 return cb(e);
