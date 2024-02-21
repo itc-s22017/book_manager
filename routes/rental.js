@@ -47,7 +47,7 @@ router.post("/start", isLogin, async (req, res, next) => {
     }
 });
 
-router.put("/return", async (req, res, next) => {
+router.put("/return", isLogin, async (req, res, next) => {
     const {rentalId} = req.body;
 
     try {
@@ -88,6 +88,33 @@ router.put("/return", async (req, res, next) => {
     } catch (e) {
         return res.status(400).json({result: "NG"});
     }
+});
+
+router.get("/current", isLogin, async (req, res, next) => {
+    const currentRental = await prisma.rental.findMany({
+        where: {
+            returnDate: null
+        },
+        include: {
+            book: {
+                select: {
+                    title: true
+                }
+            }
+        }
+    });
+
+    const response = currentRental.map(info => {
+        return {
+            rentalId: Number(info.id),
+            bookId: Number(info.bookId),
+            bookName: info.book.title,
+            rentalDate: info.rentalDate,
+            returnDeadline: info.returnDeadline
+        }
+    })
+
+    return res.status(200).json({rentalBooks: response})
 });
 
 
