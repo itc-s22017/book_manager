@@ -98,13 +98,18 @@ router.get("/rental/current/:uid", isAdmin, async (req, res, next) => {
                     title: true
                 }
             },
-            user: {
-                select: {
-                    name: true
-                }
-            }
         }
     });
+
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: uid
+        },
+        select: {
+            name: true
+        }
+    })
 
     const response = userRentals.map(info => {
         return {
@@ -116,9 +121,7 @@ router.get("/rental/current/:uid", isAdmin, async (req, res, next) => {
         }
     });
 
-    const userName = userRentals[0]?.user.name;
-
-    return res.status(200).json({userId: Number(uid), userName, response})
+    return res.status(200).json({userId: Number(uid), userName:user.name, response})
 });
 
 
