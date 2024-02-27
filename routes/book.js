@@ -105,7 +105,7 @@ router.get("/detail/:id", login, async (req, res, next) => {
     });
     const isRental = bookDetails.Rental[0];
     const rInfo = isRental ? {
-        username: isRental.user.name,
+        userName: isRental.user.name,
         rentalDate: isRental.rentalDate,
         returnDeadline: isRental.returnDeadline
     } : null;
