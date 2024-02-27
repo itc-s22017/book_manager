@@ -29,12 +29,12 @@ router.post("/book/create", isAdmin, async (req, res, next) => {
     }
 })
 
-router.put("/book/update",isAdmin, async (req, res, next) => {
-    const {isbn13, title, publishDate, author,bookId} = req.body;
+router.put("/book/update", isAdmin, async (req, res, next) => {
+    const {isbn13, title, publishDate, author, bookId} = req.body;
     try {
         await prisma.book.update({
-            where:{
-                id:bookId,
+            where: {
+                id: bookId,
             },
             data: {
                 isbn13,
@@ -49,7 +49,77 @@ router.put("/book/update",isAdmin, async (req, res, next) => {
         return res.status(400).json({result: "NG"})
 
     }
-})
+});
+
+router.get("/rental/current", isAdmin, async (req, res, next) => {
+    const allUsersCurrentRental = await prisma.rental.findMany({
+        where: {
+            returnDate: null,
+        },
+        include: {
+            book: {
+                select: {
+                    title: true
+                },
+            },
+            user: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    const response = allUsersCurrentRental.map(info => {
+        return {
+            rentalId: Number(info.id),
+            userId: Number(info.userId),
+            userName: info.user.name,
+            bookId: Number(info.bookId),
+            bookName: info.book.title,
+            rentalDate: info.rentalDate,
+            returnDeadline: info.returnDeadline
+        }
+    })
+    return res.status(200).json({rentalBooks: response})
+});
+
+router.get("/rental/current/:uid", isAdmin, async (req, res, next) => {
+    const {uid} = req.params;
+
+    const userRentals = await prisma.rental.findMany({
+        where: {
+            returnDate: null,
+            userId: uid
+        },
+        include: {
+            book: {
+                select: {
+                    title: true
+                }
+            },
+            user: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    const response = userRentals.map(info => {
+        return {
+            rentalId: Number(info.id),
+            bookId: Number(info.bookId),
+            bookName: info.book.title,
+            rentalDate: info.rentalDate,
+            returnDeadline: info.returnDeadline
+        }
+    });
+
+    const userName = userRentals[0]?.user.name;
+
+    return res.status(200).json({userId: Number(uid), userName, response})
+});
 
 
 module.exports = router;

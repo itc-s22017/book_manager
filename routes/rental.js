@@ -93,7 +93,8 @@ router.put("/return", isLogin, async (req, res, next) => {
 router.get("/current", isLogin, async (req, res, next) => {
     const currentRental = await prisma.rental.findMany({
         where: {
-            returnDate: null
+            returnDate: null,
+            userId:req.user.id
         },
         include: {
             book: {
@@ -120,7 +121,8 @@ router.get("/current", isLogin, async (req, res, next) => {
 router.get("/history", isLogin, async (req, res, next) => {
     const rentalHistory = await prisma.rental.findMany({
         where: {
-           NOT:{
+            userId:req.user.id,
+            NOT:{
                returnDate:null
            }
         },
@@ -145,6 +147,9 @@ router.get("/history", isLogin, async (req, res, next) => {
 
     return res.status(200).json({rentalHistory: response})
 });
+
+
+
 
 
 module.exports = router;
