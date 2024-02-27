@@ -33,7 +33,7 @@ router.get("/list", isLogin, async (req, res, next) => {
     });
     bookRentals = bookRentals.map(book => ({
         ...book,
-        isRental: book.Rental.some(rental => rental.returnDate === null) ? "true" : "false"
+        isRental: book.Rental.some(rental => rental.returnDate === null) ? Boolean(1) : Boolean(0)
     }));
 
     bookRentals = bookRentals.map(({id, title, author, isRental}) => ({
